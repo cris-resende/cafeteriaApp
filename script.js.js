@@ -74,26 +74,49 @@ function registrarVenda(produto, quantidade, preco) {
                 if (validaEstoque) {
 
                     atualizarEstoque(produto, quantidade);
-                    return ("[" + numeroTransacao + "]Venda registrada com sucesso: \n" + produto + ": " + quantidade + " unidade \nR$" + preco + " cada unidade \nData: " + data);
+                    return {
+                        mensagem: ("[" + numeroTransacao + "]Venda registrada com sucesso: \n" + produto + ": " + quantidade + " unidade \nR$" + preco + " cada unidade \nData: " + data),
+                        sucesso: true
+                    }
                 } else {
-                    return ("Problemas na validação de produtos no estoque.");
+                    return {
+                        mensagem: ("Problemas na validação de produtos no estoque."),
+                        sucesso: false
+                    }
                 }
             } else {
-                return ("Problemas na validação do preço unitário.");
+                return {
+                    mensagem: ("Problemas na validação do preço unitário."),
+                    sucesso: false
+                }
             }
         } else {
-            return ("Problema na validação de quantidade do produto.");
+            return {
+                mensagem: ("Problema na validação de quantidade do produto."),
+                sucesso: false
+            }
         }
     } else {
-        return ("Problemas na validação de campos obrigatórios.");
+        return {
+            mensagem: ("Problemas na validação de campos obrigatórios."),
+            sucesso: false
+        }
     }
 }
 
-function historicoVendas(mensagem) {
-    const historico = document.getElementById("historicoVendas");
-    const li = document.createElement("li");
-    li.textContent = mensagem;
-    historico.appendChild(li);
+function historicoVendas(mensagem, sucesso = true) {
+    const divAlerta = document.getElementById("divAlerta")
+    divAlerta.style.display = "none";
+    if (sucesso) {
+        const historico = document.getElementById("historicoVendas");
+        const li = document.createElement("li");
+        li.textContent = mensagem;
+        historico.appendChild(li);
+    } else {
+        divAlerta.className = "alert alert-warning";
+        divAlerta.innerHTML = "<strong>Atenção! </strong>" + mensagem;
+        divAlerta.style.display = "block";
+    }
     // RN06 - Histórico de vendas.
 }
 
@@ -102,6 +125,6 @@ function vender() {
     const quantidade = document.getElementById("quantidade").value;
     const preco = document.getElementById("preco").value;
 
-    let mensagem = registrarVenda(produto, quantidade, preco);
-    historicoVendas(mensagem);
+    let resultado = registrarVenda(produto, quantidade, preco);
+    historicoVendas(resultado.mensagem, resultado.sucesso);
 }
